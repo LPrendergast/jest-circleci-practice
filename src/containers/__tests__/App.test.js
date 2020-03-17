@@ -3,6 +3,7 @@ import { shallow } from 'enzyme'
 import toJson from 'enzyme-to-json'
 import { App } from '../App'
 import Picker from '../../components/Picker'
+import Posts from '../../components/Posts'
 import * as actions from '../../actions'
 
 describe('App', () => {
@@ -55,6 +56,8 @@ describe('App', () => {
     actions.fetchPostsIfNeeded = jest.fn()
 
     const wrapper = shallow(<App {...props} />)
+    expect(props.dispatch.mock.calls.length).toBe(1)
+    expect(actions.fetchPostsIfNeeded.mock.calls.length).toBe(1)
     wrapper.instance().handleRefreshClick(mockEvent)
 
     expect(mockEvent.preventDefault).toHaveBeenCalled()
