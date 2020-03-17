@@ -1,4 +1,9 @@
 import * as actions from '../index'
+import thunk from 'redux-thunk'
+import fetchMock from 'fetch-mock'
+import configureMockStore from 'redux-mock-store'
+const middlewares = [thunk]
+const mockStore = configureMockStore(middlewares)
 
 describe('actions', () => {
   const subreddit = 'reactjs'
@@ -29,6 +34,37 @@ describe('actions', () => {
       expect(actions.receivePosts(subreddit, mockJSON)).toMatchObject(
         expectedAction
       )
+    })
+  })
+
+  describe('fetchPosts', () => {
+    afterEach(() => {
+      // restore fetch() to its native implementation
+      fetchMock.restore()
+    })
+
+    it('creates REQUEST_POSTS and RECEIVE_POSTS when fetching posts', () => {
+      // Mock the returned data when we call the Reddit API
+      fetchMock.getOnce(`https://www.reddit.com/r/${subreddit}.json`, {
+        body: mockJSON
+      })
+
+      // The sequence of actions we expect to be dispatched
+      const expectedActions = [
+        { type: actions.REQUEST_POSTS },
+        {
+          type: actions.RECEIVE_POSTS,
+          subreddit,
+          posts: actions.transformResponseBody(mockJSON)
+        }
+      ]
+
+      // Create a store with the provided object as the initial state
+      const store = mockStore({})
+
+      return store.dispatch(actions.fetchPostsIfNeeded(subreddit)).then(() => {
+        expect(store.getActions()).toMatchObject(expectedActions)
+      })
     })
   })
 })
