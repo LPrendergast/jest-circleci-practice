@@ -27,4 +27,16 @@ describe('App', () => {
     const PickerComponent = wrapper.find(Picker)
     expect(PickerComponent.props().value).toBe(props.selectedSubreddit)
   })
+
+  it('renders the Refresh button when the isFetching prop is false', () => {
+    const props = {
+      isFetching: false,
+      dispatch: jest.fn(),
+      selectedSubreddit: 'reactjs',
+      posts: []
+    }
+    const wrapper = shallow(<App {...props} />)
+    const RefreshButton = wrapper.find('button')
+    expect(RefreshButton.length).toBe(1)
+  })
 })
